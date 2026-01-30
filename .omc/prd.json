@@ -1,215 +1,154 @@
 {
-  "project": "ReadAlongBuddy - Phase 2 & 3",
-  "branchName": "ralph/read-along-buddy-phase2-3",
-  "description": "기존 Phase 1(MVP) 위에 Phase 2(따라 읽기/발음 교정/한글 지원)와 Phase 3(책 단위 관리) 기능을 확장 구현",
+  "project": "ReadAlongBuddy UX Enhancement (Phase 4)",
+  "branchName": "ralph/ux-enhancement-phase4",
+  "description": "Google Read Along 앱을 참조하여 ReadAlongBuddy의 UX와 기능을 대폭 개선. 캐릭터 기반 피드백, 게이미피케이션(별/배지), 실시간 읽기 지원, 진행률 추적 등 아이 친화적 경험 강화.",
   "implementationPath": "workplace/with-omc/test-buddy-20260128/",
   "techStack": {
     "language": "Python 3.12+",
     "framework": "Streamlit",
-    "ocr": "pytesseract (Tesseract OCR) - eng + kor",
-    "tts": "gTTS (en + ko)",
-    "stt": "Web Speech API (JavaScript, 브라우저 내장)",
-    "pdf": "PyMuPDF (fitz) or pdf2image",
+    "ocr": "pytesseract (Tesseract OCR)",
+    "tts": "gTTS",
+    "stt": "Web Speech API",
     "hosting": "Streamlit Cloud (free)"
   },
-  "existingPhase1": {
-    "status": "COMPLETED",
-    "files": ["app.py", "modules/ocr.py", "modules/tts.py", "modules/ui.py", "modules/__init__.py", "requirements.txt", "packages.txt", ".streamlit/config.toml", "README.md"],
-    "features": ["FR-001 이미지 입력", "FR-002 OCR", "FR-003 TTS", "FR-004 텍스트 편집"]
+  "existingPhases": {
+    "phase1": "COMPLETED - 이미지 입력, OCR, TTS, 텍스트 편집",
+    "phase2": "COMPLETED - 따라 읽기, STT, 발음 피드백, 한글 지원, 읽기 기록",
+    "phase3": "COMPLETED - PDF 업로드, 책 생성, 라이브러리, 페이지 네비게이션"
+  },
+  "referenceApp": {
+    "name": "Google Read Along",
+    "url": "https://readalong.google.com/",
+    "keyFeatures": [
+      "Diya - 친근한 읽기 친구 캐릭터 (실시간 격려, 도움)",
+      "별(Stars) - 단어/문장 정확히 읽으면 즉시 획득",
+      "배지(Badges) - 누적 성과에 따른 보상",
+      "격려 중심 UX - false positive 최적화 (틀려도 격려)",
+      "진행률 추적 - 부모가 아이 성장 확인",
+      "프로필 시스템 - 여러 아이 각자 진행 관리"
+    ]
   },
   "userStories": [
     {
-      "id": "US-P2-001",
-      "title": "따라 읽기 모드 - 문장 분리 및 문장별 TTS (FR-005)",
-      "description": "As a child user, I want the app to read one sentence at a time so that I can follow along and repeat after it.",
+      "id": "US-UX-001",
+      "title": "읽기 친구 캐릭터 시스템 (버디)",
+      "description": "As a 어린이 사용자, I want to 친근한 캐릭터(버디)가 나를 도와주는 것처럼 느끼고 싶어요 so that 읽기가 더 재미있고 덜 무섭게 느껴져요.",
       "acceptanceCriteria": [
-        "인식된 텍스트를 문장 단위로 분리 (마침표/물음표/느낌표 기준)",
-        "문장별 TTS 개별 재생 (현재 문장만 음성 생성)",
-        "현재 재생 중인 문장 하이라이트 표시",
-        "이전/다음/반복 버튼으로 문장 이동",
-        "따라 읽기 대기 시간 (문장 TTS 재생 후 사용자 따라 읽기 대기)",
-        "기존 전체 읽기 모드와 따라 읽기 모드 토글 전환",
-        "기존 Phase 1 기능 깨지지 않음"
+        "캐릭터 아바타가 화면 하단/측면에 항상 표시됨",
+        "캐릭터가 상황에 맞는 표정 변화 (기본/기쁨/격려/축하)",
+        "캐릭터 말풍선으로 상황별 메시지 전달",
+        "CSS 애니메이션으로 캐릭터 움직임",
+        "modules/buddy.py 새 모듈 생성",
+        "Python 문법 오류 없음"
       ],
       "priority": 1,
       "passes": false
     },
     {
-      "id": "US-P2-002",
-      "title": "발음 인식 STT - Web Speech API 연동 (FR-006)",
-      "description": "As a child user, I want to speak into the microphone so that the app can hear my pronunciation.",
+      "id": "US-UX-002",
+      "title": "별(Stars) 보상 시스템",
+      "description": "As a 어린이 사용자, I want to 잘 읽으면 별을 받고 싶어요 so that 성취감을 느끼고 더 열심히 읽고 싶어져요.",
       "acceptanceCriteria": [
-        "Web Speech API를 Streamlit 내 JavaScript로 연동",
-        "마이크 권한 요청 및 상태 표시 (허용/거부/미지원)",
-        "녹음 시작/중지 버튼 UI (큰 마이크 버튼)",
-        "실시간 음성 → 텍스트 변환 결과 표시",
-        "인식된 사용자 발음 텍스트를 session_state에 저장",
-        "브라우저 미지원 시 안내 메시지 표시"
+        "따라 읽기에서 문장 정확도 70% 이상이면 별 1~3개 획득",
+        "현재 세션 총 별 수 헤더에 표시",
+        "별 획득 시 시각적 애니메이션 (CSS keyframes)",
+        "별 데이터 session_state에 저장",
+        "modules/rewards.py 새 모듈 생성",
+        "Python 문법 오류 없음"
       ],
       "priority": 2,
       "passes": false
     },
     {
-      "id": "US-P2-003",
-      "title": "발음 교정 피드백 (FR-007)",
-      "description": "As a child user, I want to see how well I pronounced the sentence so that I can improve my reading.",
+      "id": "US-UX-003",
+      "title": "배지 및 레벨 시스템",
+      "description": "As a 어린이 사용자, I want to 배지를 모으고 레벨업하고 싶어요 so that 꾸준히 읽을 동기가 생겨요.",
       "acceptanceCriteria": [
-        "원본 텍스트와 사용자 발음 텍스트 비교 알고리즘 (difflib 또는 유사도 계산)",
-        "정확도 점수 표시 (0~100%)",
-        "틀린 단어 하이라이트 (빨간색/초록색 표시)",
-        "아이 친화적 피드백 메시지 (별점, 격려 문구)",
-        "점수에 따른 다음 단계 진행 (80% 이상 → 다음 문장)"
+        "누적 별 수에 따른 레벨 시스템 (5단계: 새싹→꼬마독서가→독서왕→마스터→전설)",
+        "마일스톤 배지 (첫 책 읽기, 10권 읽기, 100별 획득 등)",
+        "'내 프로필' 화면에서 배지 컬렉션 표시",
+        "레벨업/배지 획득 시 축하 팝업 + 캐릭터 축하",
+        "rewards.py에 배지/레벨 로직 추가",
+        "Python 문법 오류 없음"
       ],
       "priority": 3,
       "passes": false
     },
     {
-      "id": "US-P2-004",
-      "title": "읽기 동기화 하이라이트 (FR-008)",
-      "description": "As a child user, I want to see which word is being read so that I can follow along visually.",
+      "id": "US-UX-004",
+      "title": "실시간 단어별 피드백 강화",
+      "description": "As a 어린이 사용자, I want to 읽는 동안 단어마다 즉시 피드백을 받고 싶어요 so that 어떤 단어를 잘 읽었는지 바로 알 수 있어요.",
       "acceptanceCriteria": [
-        "TTS 재생 시 현재 읽히는 문장/단어 하이라이트",
-        "단어 단위 또는 문장 단위 하이라이트 선택",
-        "하이라이트 색상이 아이 친화적 (밝은 노란/초록)",
-        "자동 스크롤로 현재 위치 추적",
-        "하이라이트가 TTS 재생과 동기화"
+        "따라 읽기 모드에서 단어별 결과 하이라이트",
+        "정확히 읽은 단어 초록색 + 체크 아이콘",
+        "틀린 단어 주황색 표시 (빨간색 X 아님 - 격려 UX)",
+        "캐릭터가 격려 메시지 ('조금만 더!', '잘했어!')",
+        "pronunciation.py 피드백 강화",
+        "Python 문법 오류 없음"
       ],
       "priority": 4,
       "passes": false
     },
     {
-      "id": "US-P2-005",
-      "title": "한글 OCR 및 TTS 지원 (FR-009)",
-      "description": "As a Korean child user, I want to use the app with Korean books so that I can read Korean stories too.",
+      "id": "US-UX-005",
+      "title": "진행률 대시보드",
+      "description": "As a 부모/어린이 사용자, I want to 읽기 진행 상황을 한눈에 보고 싶어요 so that 얼마나 성장했는지 알 수 있어요.",
       "acceptanceCriteria": [
-        "OCR 언어 선택 옵션 (영어/한글/자동 감지)",
-        "pytesseract 한글 인식 (lang='kor' 또는 'kor+eng')",
-        "gTTS 한글 음성 합성 (lang='ko')",
-        "한글 텍스트 전처리 및 문장 분리",
-        "packages.txt에 tesseract-ocr-kor 추가",
-        "기존 영어 기능 정상 작동 유지"
+        "오늘 읽은 페이지 수 표시",
+        "세션 내 총 읽은 문장/단어 수",
+        "총 획득 별 수 및 현재 레벨",
+        "읽기 기록 모드에 통계 섹션 추가",
+        "modules/stats.py 새 모듈 생성",
+        "Python 문법 오류 없음"
       ],
       "priority": 5,
       "passes": false
     },
     {
-      "id": "US-P2-006",
-      "title": "읽기 기록 (FR-010)",
-      "description": "As a child user, I want to see my reading history so that I can review what I've read.",
+      "id": "US-UX-006",
+      "title": "UI 시각 개선 (아이 친화적)",
+      "description": "As a 어린이 사용자, I want to 더 예쁘고 재미있는 화면을 보고 싶어요 so that 앱을 열 때마다 기분이 좋아져요.",
       "acceptanceCriteria": [
-        "세션 내 읽기 기록 저장 (session_state 기반)",
-        "읽기 기록 목록 표시 (시간, 텍스트 미리보기, 이미지 썸네일)",
-        "기록 선택 시 해당 텍스트/이미지 복원",
-        "기록 삭제 기능",
-        "세션 종료 시 데이터 자동 삭제 (프라이버시)"
+        "밝고 따뜻한 색상 팔레트 적용 (파스텔 톤)",
+        "큰 둥근 버튼 (최소 48px 터치 영역)",
+        "이모지/아이콘 적극 활용",
+        "부드러운 그라데이션 배경",
+        "카드 UI에 그림자 및 둥근 모서리",
+        "ui.py CSS 전면 개선",
+        "Python 문법 오류 없음"
       ],
       "priority": 6,
       "passes": false
     },
     {
-      "id": "US-P2-007",
-      "title": "음성 선택 (FR-011)",
-      "description": "As a child user, I want to choose different voices so that I can pick my favorite one.",
+      "id": "US-UX-007",
+      "title": "사운드 피드백",
+      "description": "As a 어린이 사용자, I want to 별 획득, 레벨업 시 소리가 나면 좋겠어요 so that 더 재미있게 느껴져요.",
       "acceptanceCriteria": [
-        "gTTS 지원 언어/방언 기반 음성 옵션 (예: en-us, en-gb, en-au)",
-        "음성 미리듣기 기능",
-        "선택한 음성 설정 세션 내 유지",
-        "음성 선택 UI (드롭다운 또는 카드 형태)"
+        "별 획득 시 효과음 (팅! 소리)",
+        "배지 획득 시 축하 효과음",
+        "정답/격려 시 다른 효과음",
+        "사이드바에 소리 on/off 토글",
+        "base64 인코딩 오디오 또는 Web Audio API",
+        "Python 문법 오류 없음"
       ],
       "priority": 7,
       "passes": false
     },
     {
-      "id": "US-P3-001",
-      "title": "PDF 업로드 및 페이지 추출 (FR-012)",
-      "description": "As a user, I want to upload a PDF file so that I can read an entire book without photographing each page.",
+      "id": "US-UX-008",
+      "title": "Phase 4 통합 및 기존 기능 검증",
+      "description": "As a 사용자, I want to 새 기능이 추가되어도 기존 기능이 잘 작동하길 원해요 so that 안정적으로 사용할 수 있어요.",
       "acceptanceCriteria": [
-        "PDF 파일 업로드 지원 (Streamlit file_uploader)",
-        "PDF → 이미지 페이지 변환 (PyMuPDF fitz 또는 pdf2image)",
-        "각 페이지를 이미지로 추출하여 OCR 파이프라인 연결",
-        "PDF 페이지 수 표시 및 페이지 선택",
-        "대용량 PDF 처리 시 진행 표시",
-        "기존 이미지 업로드 기능과 공존"
+        "Phase 1 기능 (OCR → TTS → 편집) 정상 작동",
+        "Phase 2 기능 (따라 읽기, STT, 피드백) 정상 작동",
+        "Phase 3 기능 (PDF, 책 라이브러리, 네비게이션) 정상 작동",
+        "Phase 4 기능 (캐릭터, 별, 배지, 대시보드) 통합",
+        "Python 문법 검증 통과",
+        "streamlit run app.py 실행 성공",
+        "execution_log.md에 모든 단계 기록"
       ],
       "priority": 8,
-      "passes": false
-    },
-    {
-      "id": "US-P3-002",
-      "title": "책 생성 - 여러 페이지를 한 권으로 (FR-013)",
-      "description": "As a user, I want to combine multiple pages into a book so that I can read through the whole story.",
-      "acceptanceCriteria": [
-        "여러 이미지를 순서대로 추가하여 '책' 생성",
-        "책 제목 입력",
-        "페이지 순서 변경/삭제 가능",
-        "각 페이지에 OCR 텍스트 자동 연결",
-        "책 데이터는 세션 내에서만 유지 (저작권 보호)",
-        "책 생성 완료 시 자동으로 첫 페이지로 이동"
-      ],
-      "priority": 9,
-      "passes": false
-    },
-    {
-      "id": "US-P3-003",
-      "title": "책 라이브러리 - 내 책장 (FR-014)",
-      "description": "As a user, I want to see all my created books in a library so that I can pick which one to read.",
-      "acceptanceCriteria": [
-        "생성된 책 목록을 카드/그리드 형태로 표시",
-        "책 커버 이미지 (첫 페이지 썸네일)",
-        "책 제목, 페이지 수, 생성 시간 표시",
-        "책 선택 시 읽기 모드로 이동",
-        "책 삭제 기능",
-        "세션 내에서만 유지 (저작권 보호)",
-        "저작권 안내 문구 표시 (외부 공유/다운로드 불가 안내)"
-      ],
-      "priority": 10,
-      "passes": false
-    },
-    {
-      "id": "US-P3-004",
-      "title": "페이지 네비게이션 (FR-015)",
-      "description": "As a user, I want to navigate between pages of a book so that I can read the whole story.",
-      "acceptanceCriteria": [
-        "이전/다음 페이지 버튼",
-        "페이지 번호 표시 (현재/전체)",
-        "페이지 이동 시 자동 OCR 및 텍스트 표시",
-        "페이지 썸네일 네비게이터 (선택사항)",
-        "키보드 방향키로 페이지 이동 지원"
-      ],
-      "priority": 11,
-      "passes": false
-    },
-    {
-      "id": "US-P3-005",
-      "title": "연속 읽기 모드 (FR-016)",
-      "description": "As a child user, I want the app to read the entire book continuously so that I can listen to the whole story.",
-      "acceptanceCriteria": [
-        "책 전체 페이지를 순차적으로 자동 읽기",
-        "현재 페이지 자동 전환 (TTS 완료 → 다음 페이지)",
-        "일시정지/재개 컨트롤",
-        "현재 읽기 위치 표시 (페이지 N/M)",
-        "연속 읽기 중 수동 페이지 이동 가능"
-      ],
-      "priority": 12,
-      "passes": false
-    },
-    {
-      "id": "US-P3-006",
-      "title": "저작권 보호 및 Phase 2+3 통합 테스트",
-      "description": "As a parent, I want the app to respect copyright and work reliably so that my child can use it safely.",
-      "acceptanceCriteria": [
-        "생성된 책의 외부 공유 기능 없음",
-        "다운로드/내보내기 기능 없음",
-        "책 데이터는 세션 내에서만 유지",
-        "저작권 안내 문구 모든 관련 화면에 표시",
-        "Phase 1 기능(이미지 OCR → TTS → 편집) 정상 작동",
-        "Phase 2 기능(따라 읽기, STT, 피드백) 정상 작동",
-        "Phase 3 기능(PDF, 책 생성, 라이브러리, 네비게이션, 연속 읽기) 정상 작동",
-        "Python 문법 검증 통과",
-        "requirements.txt 의존성 설치 성공",
-        "streamlit run app.py 실행 성공"
-      ],
-      "priority": 13,
       "passes": false
     }
   ]

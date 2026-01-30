@@ -5,8 +5,8 @@
 - **Date**: 2026-01-28
 - **Plugin**: with-omc (oh-my-claudecode v3.7.2)
 - **PRD**: ReadAlongBuddy (docs/buddy_PRD.md)
-- **Target**: Phase 1(MVP) + Phase 2 + Phase 3 전체 (FR-001 ~ FR-016)
-- **사용 스킬**: ralph-init → ralph (ultrawork 자동 활성화) x2회
+- **Target**: Phase 1(MVP) + Phase 2 + Phase 3 + Phase 4(UX) 전체
+- **사용 스킬**: ralph-init → ralph (ultrawork 자동 활성화) x3회
 
 ## Token Usage
 
@@ -30,27 +30,28 @@
 | executor-high (Opus) | HIGH | 1회 | app.py 전체 재작성 (709줄) |
 | executor-low (Haiku) | LOW | 1회 | requirements.txt + packages.txt 업데이트 |
 | writer (Haiku) | LOW | 1회 | README.md 작성 |
-| architect (Opus) | HIGH | 2회 | Phase 1 검증(2건 이슈) + Phase 2+3 검증(11건 이슈) |
+| architect (Opus) | HIGH | 3회 | Phase 1 검증(2건 이슈) + Phase 2+3 검증(11건 이슈) + Phase 4 검증(3건 이슈) |
+| designer (Sonnet) | MEDIUM | 1회 | Phase 4 ui.py 개선 (US-UX-006) |
 
 ## Skill Usage Summary
 
 | 스킬 | 호출 방식 | 횟수 | 용도 |
 |------|----------|------|------|
-| ralph-init | 슬래시커맨드 | 2회 | Phase 1 PRD(7 US) + Phase 2+3 PRD(13 US) 분해 |
-| ralph | 슬래시커맨드 | 2회 | Phase 1 자율 루프 + Phase 2+3 자율 루프 |
+| ralph-init | 슬래시커맨드 | 3회 | Phase 1 PRD(7 US) + Phase 2+3 PRD(13 US) + Phase 4 PRD(8 US) 분해 |
+| ralph | 슬래시커맨드 | 3회 | Phase 1 자율 루프 + Phase 2+3 자율 루프 + Phase 4 자율 루프 |
 
 ## Implementation Summary
 
-| 항목 | Phase 1 | Phase 2+3 | 전체 |
-|------|---------|-----------|------|
-| User Stories | 7개 | 13개 | 20개 |
-| 소스 파일 수 | 5개 | 5개 신규 + 4개 수정 | 10개 |
-| 설정/문서 파일 | 4개 | 2개 수정 | 4개 |
-| 총 소스 코드 라인 | ~277줄 | +~1,255줄 | ~1,532줄 |
-| PRD 충족률 | 100% (FR-001~004) | 11/12 PASS + 2 PARTIAL | 전체: 14 PASS + 2 PARTIAL |
-| Architect 검증 | PASS (2건→수정) | PASS (11건→4건 수정) | 2회 검증 완료 |
-| Python 문법 검증 | ALL PASS | ALL PASS | 9개 파일 ALL PASS |
-| 의존성 설치 | ALL SUCCESS | PyMuPDF 추가 | ALL SUCCESS |
+| 항목 | Phase 1 | Phase 2+3 | Phase 4 | 전체 |
+|------|---------|-----------|---------|------|
+| User Stories | 7개 | 13개 | 8개 | 28개 |
+| 소스 파일 수 | 5개 | 5개 신규 + 4개 수정 | 4개 신규 + 3개 수정 | 13개 |
+| 설정/문서 파일 | 4개 | 2개 수정 | - | 4개 |
+| 총 소스 코드 라인 | ~277줄 | +~1,255줄 | +~1,200줄 | ~2,732줄 |
+| PRD 충족률 | 100% (FR-001~004) | 11/12 PASS + 2 PARTIAL | 8/8 PASS | 전체: 22 PASS + 2 PARTIAL |
+| Architect 검증 | PASS (2건→수정) | PASS (11건→4건 수정) | PASS (3건→2건 수정) | 3회 검증 완료 |
+| Python 문법 검증 | ALL PASS | ALL PASS | ALL PASS | 13개 파일 ALL PASS |
+| 의존성 설치 | ALL SUCCESS | PyMuPDF 추가 | - | ALL SUCCESS |
 
 ## Ralph Loop Detail
 
@@ -71,6 +72,15 @@
 | 5c | Architect 리뷰 | architect(Opus) | HIGH | 1 CRITICAL + 4 MED + 6 LOW |
 | 5d | 이슈 수정 (4건) | executor(Sonnet) | MEDIUM | 2파일 수정 |
 | 5e | 문법 재검증 | MAIN | MAIN | ALL PASS |
+
+### Phase 4 Ralph Loop
+| 단계 | 설명 | 주체 에이전트 | 모델 | 결과 |
+|------|------|-------------|------|------|
+| 10a | 7개 에이전트 병렬 실행 | executor x5 + designer + executor-high | MED x6 + HIGH | 4신규 + 3수정 |
+| 10b | 문법 검증 | MAIN | MAIN | ALL PASS |
+| 10c | Architect 리뷰 | architect(Opus) | HIGH | 3 MEDIUM |
+| 10d | 이슈 수정 (2건) | MAIN | MAIN | 2파일 수정 |
+| 10e | 문법 재검증 | MAIN | MAIN | ALL PASS |
 
 ## Task Completion (전체)
 
@@ -95,6 +105,16 @@
 - [x] FR-014: 책 라이브러리 (3열 그리드 카드 + 읽기/삭제)
 - [x] FR-015: 페이지 네비게이션 (이전/다음 + 페이지 카운터)
 - [~] FR-016: 연속 읽기 (토글 활성화 + 수동 다음페이지)
+
+### Phase 4 (UX Enhancement)
+- [x] US-UX-001: 버디 캐릭터 시스템 (modules/buddy.py)
+- [x] US-UX-002: 별 보상 시스템 (modules/rewards.py)
+- [x] US-UX-003: 배지 및 레벨 시스템 (modules/rewards.py)
+- [x] US-UX-004: 단어별 피드백 강화 (modules/pronunciation.py)
+- [x] US-UX-005: 진행률 대시보드 (modules/stats.py)
+- [x] US-UX-006: UI 시각 개선 (modules/ui.py)
+- [x] US-UX-007: 사운드 피드백 (modules/sound.py)
+- [x] US-UX-008: Phase 4 통합 (app.py)
 
 ### 비기능 요구사항
 - [x] 아이 친화적 UI (큰 버튼, 밝은 색상, 한글 라벨, 3터치 이내)
@@ -127,6 +147,14 @@
 16. 버그 수정 작업은 MAIN이 직접 수행 (에이전트 위임 불필요한 단순 작업)
 17. OpenCV 고급 전처리 추가로 OCR 정확도 대폭 개선 (인식불가 → 읽기 가능)
 18. 스마트 선택 알고리즘: 기본/고급 전처리 중 더 좋은 결과 자동 선택
+
+### Phase 4 관찰
+19. Google Read Along 분석을 통해 UX 개선 포인트 도출 (WebSearch + WebFetch)
+20. Phase 4는 7개 에이전트 동시 병렬 실행 (역대 최대)
+21. designer 에이전트 첫 사용 (UI 개선 전문)
+22. Architect 검증에서 accuracy 변환 오류 발견 (0.0-1.0 → 0-100)
+23. Web Audio API 비표준 메서드 사용 이슈도 Architect가 발견
+24. 격려 중심 UX 철학 반영 (빨간색 X → 주황색 격려)
 
 ## Bug Fixes Summary
 

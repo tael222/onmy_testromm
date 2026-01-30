@@ -49,8 +49,58 @@ def get_word_comparison(original: str, spoken: str) -> list[dict]:
     return result
 
 
+def get_word_feedback_html(expected: str, actual: str) -> str:
+    """Generate encouraging word-by-word feedback HTML.
+
+    Args:
+        expected: Expected text from the book
+        actual: Text recognized from user's speech
+
+    Returns:
+        HTML string with word-by-word feedback using encouraging color scheme
+    """
+    expected_words = expected.lower().strip().split()
+    actual_words = actual.lower().strip().split()
+
+    html_parts = []
+    for i, exp_word in enumerate(expected_words):
+        act_word = actual_words[i] if i < len(actual_words) else ""
+
+        # Use SequenceMatcher for word similarity
+        similarity = difflib.SequenceMatcher(None, exp_word, act_word).ratio()
+
+        if similarity >= 0.8:
+            # Correct - green with check
+            html_parts.append(f'<span class="word-correct">{exp_word} ✓</span>')
+        else:
+            # Needs practice - orange (encouraging, not punishing)
+            html_parts.append(f'<span class="word-practice">{exp_word}</span>')
+
+    css = '''
+    <style>
+    .word-feedback { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+    .word-correct {
+        background: #E8F5E9;
+        color: #2E7D32;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    .word-practice {
+        background: #FFF3E0;
+        color: #E65100;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    </style>
+    '''
+
+    return css + f'<div class="word-feedback">{" ".join(html_parts)}</div>'
+
+
 def get_feedback_html(score: float, word_results: list[dict]) -> str:
-    """Generate child-friendly HTML feedback.
+    """Generate child-friendly HTML feedback with encouraging UX.
 
     Args:
         score: similarity score (0.0 to 1.0)
@@ -58,40 +108,44 @@ def get_feedback_html(score: float, word_results: list[dict]) -> str:
     """
     pct = int(score * 100)
 
-    # Star rating (1-5)
+    # Star rating (1-5) with encouraging messages
     if pct >= 90:
         stars = "⭐⭐⭐⭐⭐"
         message = "완벽해요! 정말 잘 읽었어요! 🎉"
-        color = "#4ECDC4"
+        color = "#4CAF50"  # Green - excellent
     elif pct >= 70:
         stars = "⭐⭐⭐⭐"
         message = "잘했어요! 거의 다 맞았어요! 😊"
-        color = "#82C91E"
+        color = "#4CAF50"  # Green - good
     elif pct >= 50:
         stars = "⭐⭐⭐"
         message = "좋아요! 조금만 더 연습하면 완벽해요! 💪"
-        color = "#FFD43B"
+        color = "#FF9800"  # Orange - needs practice
     elif pct >= 30:
         stars = "⭐⭐"
         message = "괜찮아요! 다시 한번 들어보고 따라해요! 📖"
-        color = "#FF922B"
+        color = "#FF9800"  # Orange - encouraging
     else:
         stars = "⭐"
         message = "천천히 다시 해볼까요? 할 수 있어요! 🌟"
-        color = "#FF6B6B"
+        color = "#FF9800"  # Orange - keep trying
 
-    # Word-level display
+    # Word-level display with encouraging colors
     word_html_parts = []
     for item in word_results:
         w = item["word"]
         s = item["status"]
         if s == "correct":
-            word_html_parts.append(f'<span style="color: #2ECC71; font-weight: bold;">{w}</span>')
+            # Correct - green with check mark
+            word_html_parts.append(f'<span style="background: #E8F5E9; color: #2E7D32; padding: 4px 8px; border-radius: 8px; font-weight: 500;">{w} ✓</span>')
         elif s == "wrong":
-            word_html_parts.append(f'<span style="color: #E74C3C; text-decoration: underline wavy #E74C3C; font-weight: bold;">{w}</span>')
+            # Wrong - orange (encouraging, not red)
+            word_html_parts.append(f'<span style="background: #FFF3E0; color: #E65100; padding: 4px 8px; border-radius: 8px; font-weight: 500;">{w}</span>')
         elif s == "missing":
-            word_html_parts.append(f'<span style="color: #E67E22; opacity: 0.7; font-style: italic;">[{w}]</span>')
+            # Missing - light orange with gentle indicator
+            word_html_parts.append(f'<span style="background: #FFF3E0; color: #E65100; padding: 4px 8px; border-radius: 8px; opacity: 0.7; font-style: italic;">[{w}]</span>')
         else:  # extra
+            # Extra - gray (neutral)
             word_html_parts.append(f'<span style="color: #95A5A6; font-size: 0.9em;">({w})</span>')
 
     words_display = ' '.join(word_html_parts)
@@ -115,7 +169,7 @@ def get_feedback_html(score: float, word_results: list[dict]) -> str:
             {words_display}
         </div>
         <div style="text-align: center; margin-top: 0.8rem; font-size: 0.85rem; color: #aaa;">
-            🟢 맞은 단어 &nbsp; 🔴 틀린 단어 &nbsp; 🟠 빠진 단어
+            ✓ 잘했어요 &nbsp; 🟠 다시 연습해요
         </div>
     </div>
     """

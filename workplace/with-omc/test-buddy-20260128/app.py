@@ -1,9 +1,10 @@
-"""ReadAlongBuddy - Phase 1+2+3 Complete Application.
+"""ReadAlongBuddy - Phase 1+2+3+4 Complete Application.
 
 Main Streamlit entrypoint integrating:
   Phase 1: Image OCR, TTS playback, text editing
   Phase 2: Language/voice selection, read-along mode, STT, pronunciation feedback, history
   Phase 3: PDF upload, book library, page navigation, continuous reading, copyright
+  Phase 4: Buddy character, rewards (stars/badges/levels), stats dashboard, sound effects
 """
 
 import streamlit as st
@@ -36,6 +37,27 @@ from modules.book_manager import (
     add_book_to_library,
     remove_book_from_library,
     add_to_reading_history,
+)
+# Phase 4: Buddy, Rewards, Stats, Sound
+from modules.buddy import BuddyMood, get_buddy_component, get_mood_for_accuracy
+from modules.rewards import (
+    init_reward_state,
+    get_reward_state,
+    award_stars,
+    render_stars_html,
+    render_level_badge_html,
+    render_badge_popup_html,
+    get_rewards_css,
+)
+from modules.stats import init_stats, record_reading, record_page, get_stats_component, get_stats_css
+from modules.sound import (
+    get_sound_init_html,
+    play_star_sound,
+    play_correct_sound,
+    play_badge_sound,
+    is_sound_enabled,
+    toggle_sound,
+    get_sound_toggle_html,
 )
 
 # ---------------------------------------------------------------------------
@@ -80,6 +102,10 @@ for key, default in _DEFAULTS.items():
 # Initialise library / history lists via book_manager helper
 init_library(st.session_state)
 
+# Initialize Phase 4 systems: rewards and stats
+init_reward_state()
+init_stats()
+
 # ---------------------------------------------------------------------------
 # Sidebar  --  Navigation + Settings
 # ---------------------------------------------------------------------------
@@ -121,6 +147,19 @@ with st.sidebar:
         key="sidebar_voice",
     )
     st.session_state.voice = voice_choice
+
+    # Sound toggle (Phase 4)
+    st.markdown("---")
+    if st.button(get_sound_toggle_html(), key="sound_toggle"):
+        toggle_sound()
+        st.rerun()
+
+    # Display total stars and level (Phase 4)
+    st.markdown("---")
+    st.markdown("### 내 현황")
+    reward_state = get_reward_state()
+    st.markdown(f"**{reward_state.current_level.emoji} {reward_state.current_level.korean_name}**")
+    st.markdown(f"⭐ 모은 별: **{reward_state.total_stars}**개")
 
 # ---------------------------------------------------------------------------
 # Header (always shown)
@@ -516,7 +555,7 @@ def render_readalong_mode():
         placeholder="여기에 읽은 내용을 입력하세요...",
     )
 
-    # -- Pronunciation check --
+    # -- Pronunciation check with Phase 4 rewards --
     if st.button("✅ 발음 체크!", key="ra_check", type="primary"):
         if spoken_text.strip():
             st.session_state.stt_result = spoken_text.strip()
@@ -524,6 +563,29 @@ def render_readalong_mode():
             word_results = get_word_comparison(current_sentence, spoken_text.strip())
             feedback_html = get_feedback_html(score, word_results)
             st.markdown(feedback_html, unsafe_allow_html=True)
+
+            # Phase 4: Award stars based on accuracy (convert ratio 0.0-1.0 to percentage 0-100)
+            accuracy_percent = score * 100
+            stars_earned, new_badges = award_stars(accuracy_percent)
+            record_reading(current_sentence, accuracy_percent)
+
+            # Display stars earned
+            if stars_earned > 0:
+                st.markdown(render_stars_html(stars_earned), unsafe_allow_html=True)
+                st.markdown(play_star_sound(), unsafe_allow_html=True)
+
+            # Display new badges earned
+            for badge in new_badges:
+                st.markdown(render_badge_popup_html(badge), unsafe_allow_html=True)
+                st.markdown(play_badge_sound(), unsafe_allow_html=True)
+
+            # Display buddy with mood based on accuracy
+            buddy_mood = get_mood_for_accuracy(accuracy_percent)
+            st.markdown(get_buddy_component(buddy_mood), unsafe_allow_html=True)
+
+            # Play appropriate sound
+            if accuracy_percent >= 70:
+                st.markdown(play_correct_sound(), unsafe_allow_html=True)
         else:
             st.warning("먼저 문장을 읽어주세요!")
 
@@ -652,6 +714,11 @@ def render_history_mode():
     """Display reading history stored in session state."""
     st.markdown("### 📋 읽기 기록")
 
+    # Phase 4: Stats dashboard at the top
+    st.markdown(get_stats_css(), unsafe_allow_html=True)
+    st.markdown(get_stats_component(), unsafe_allow_html=True)
+    st.markdown("---")
+
     history = st.session_state.reading_history
 
     if not history:
@@ -703,6 +770,11 @@ def render_history_mode():
 # ###################################################################
 #  ROUTING
 # ###################################################################
+
+# Inject Phase 4 CSS and sound initialization (global)
+st.markdown(get_rewards_css(), unsafe_allow_html=True)
+st.markdown(get_sound_init_html(), unsafe_allow_html=True)
+
 if st.session_state.app_mode == "📖 읽기 모드":
     render_reading_mode()
 elif st.session_state.app_mode == "🎯 따라 읽기":
@@ -713,3 +785,7 @@ elif st.session_state.app_mode == "📋 읽기 기록":
     render_history_mode()
 else:
     render_reading_mode()
+
+# Display buddy character at bottom right (default mood when not in read-along)
+if st.session_state.app_mode not in ["🎯 따라 읽기"]:
+    st.markdown(get_buddy_component(BuddyMood.DEFAULT), unsafe_allow_html=True)

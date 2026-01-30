@@ -13,7 +13,7 @@ Implementation Path: workplace/with-omc/test-buddy-20260128/
 - [x] US-006: UI/UX 통합 및 아이 친화적 디자인
 - [x] US-007: 보안 및 배포 준비
 
-## Phase 2 User Stories
+## Phase 2 (COMPLETED)
 - [x] US-P2-001: 따라 읽기 모드 (FR-005) - reading_mode.py + app.py 따라 읽기 모드
 - [x] US-P2-002: 발음 인식 STT (FR-006) - stt.py + app.py STT 통합
 - [x] US-P2-003: 발음 교정 피드백 (FR-007) - pronunciation.py + app.py 피드백 통합
@@ -22,7 +22,7 @@ Implementation Path: workplace/with-omc/test-buddy-20260128/
 - [x] US-P2-006: 읽기 기록 (FR-010) - book_manager.py history + app.py 읽기 기록 모드
 - [x] US-P2-007: 음성 선택 (FR-011) - tts.py VOICE_OPTIONS + app.py 사이드바
 
-## Phase 3 User Stories
+## Phase 3 (COMPLETED)
 - [x] US-P3-001: PDF 업로드 (FR-012) - pdf_handler.py + app.py PDF 탭
 - [x] US-P3-002: 책 생성 (FR-013) - book_manager.py Book + app.py 내 책장
 - [x] US-P3-003: 책 라이브러리 (FR-014) - book_manager.py library + app.py 그리드
@@ -30,26 +30,51 @@ Implementation Path: workplace/with-omc/test-buddy-20260128/
 - [x] US-P3-005: 연속 읽기 (FR-016) - app.py continuous_reading
 - [x] US-P3-006: 저작권 보호 및 통합 테스트 - ui.py 저작권 + 문법 ALL PASS
 
-## Codebase Patterns (from Phase 1)
-- Streamlit app with modular architecture (modules/ocr.py, modules/tts.py, modules/ui.py)
+---
+
+## Phase 4: UX Enhancement (Google Read Along 참조)
+Started: 2026-01-30
+
+### Reference: Google Read Along
+- Diya - 친근한 읽기 친구 캐릭터 (실시간 격려, 도움)
+- 별(Stars) - 단어/문장 정확히 읽으면 즉시 획득
+- 배지(Badges) - 누적 성과에 따른 보상
+- 격려 중심 UX - false positive 최적화 (틀려도 격려)
+- 진행률 추적 - 부모가 아이 성장 확인
+
+### User Stories (Phase 4) - COMPLETED
+- [x] US-UX-001: 읽기 친구 캐릭터 시스템 (버디) - modules/buddy.py 생성
+- [x] US-UX-002: 별(Stars) 보상 시스템 - modules/rewards.py (calculate_stars, award_stars)
+- [x] US-UX-003: 배지 및 레벨 시스템 - modules/rewards.py (Level enum, Badge dataclass)
+- [x] US-UX-004: 실시간 단어별 피드백 강화 - modules/pronunciation.py (격려 UX, 초록/주황)
+- [x] US-UX-005: 진행률 대시보드 - modules/stats.py (SessionStats, 배지 그리드)
+- [x] US-UX-006: UI 시각 개선 (아이 친화적) - modules/ui.py (파스텔 색상, 큰 버튼, 그라데이션)
+- [x] US-UX-007: 사운드 피드백 - modules/sound.py (Web Audio API, 5종 효과음)
+- [x] US-UX-008: Phase 4 통합 및 기존 기능 검증 - app.py 통합 + Architect 검증 PASS
+
+---
+
+## Codebase Patterns
+- Streamlit app with modular architecture (modules/*.py)
 - Session state for text persistence across reruns
 - Custom CSS injection for child-friendly UI
 - gTTS with base64 audio embedding for playback
-- pytesseract with Pillow preprocessing for OCR
-- JS injection for playbackRate control
-
-## Phase 2+3 New Patterns
-- Sidebar navigation with 4 modes (읽기/따라읽기/책장/기록)
+- pytesseract with OpenCV preprocessing for OCR
 - Web Speech API via streamlit.components.v1.html() for STT
 - difflib.SequenceMatcher for pronunciation similarity
 - PyMuPDF for PDF → Image conversion
 - Dataclass-based Book/BookPage model
 - Session-only data (no file persistence) for copyright protection
-
-## Verification
-- Python syntax: ALL 9 FILES PASS (app.py + 8 modules)
-- Dependencies: requirements.txt updated (5 packages)
-- Packages: packages.txt updated (tesseract-ocr-kor added)
-- Total files: 14 (app.py, 8 modules, requirements.txt, packages.txt, config.toml, README.md, __init__.py)
+- Web Audio API for sound effects (Phase 4)
+- Enum-based BuddyMood and Level systems (Phase 4)
+- Gamification with stars, badges, and levels (Phase 4)
 
 ---
+
+## Phase 4 Completion Summary
+- **Completed**: 2026-01-30
+- **User Stories**: 8/8 PASS
+- **New Modules**: buddy.py, rewards.py, stats.py, sound.py
+- **Modified Modules**: ui.py, pronunciation.py, app.py
+- **Architect Verification**: PASS (3 MEDIUM issues → 2 fixed)
+- **Python Syntax**: ALL PASS (13 files)
