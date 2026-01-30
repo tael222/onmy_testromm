@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ls -la \"D:\\\\GitHub\\\\onmy_testromm\\\\workplace\\\\without-omc\"\" && echo \"---\" && ls -la \"D:GitHubonmy_testrommworkplacewithout-omctest-a-20260123\"\")",
+      "Bash(wc -l:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(git -C \"D:\\\\GitHub\\\\onmy_testromm\" log --oneline -20)",
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "Bash(node generate_report.js:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(tree:*)",
+      "WebSearch",
+      "Bash(python -m py_compile:*)",
+      "Bash(pip install:*)",
+      "Bash(tesseract:*)",
+      "Bash(python -c:*)",
+      "Bash(winget install:*)",
+      "Bash(\"C:\\\\Program Files\\\\Tesseract-OCR\\\\tesseract.exe\" --version)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(python -m streamlit run:*)",
+      "Bash(python -m playwright:*)",
+      "Bash(python:*)",
+      "Bash(where:*)",
+      "Bash(node create_docx.js:*)",
+      "Bash(node create_pptx.js:*)",
+      "Bash(ls:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(ping:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "oh-my-claudecode@omc": true
+  }
+}
